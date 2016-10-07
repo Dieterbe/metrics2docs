@@ -66,7 +66,7 @@ func main() {
 	searchDir := os.Args[1]
 	mode := parser.ParseComments
 	fset := token.NewFileSet() // positions are relative to fset
-	fmt.Println("# overview of metrics")
+	fmt.Println("# Overview of metrics")
 	fmt.Printf("(only shows metrics that are documented. generated with [metrics2docs](github.com/Dieterbe/metrics2docs))\n\n")
 	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
