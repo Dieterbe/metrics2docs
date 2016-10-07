@@ -8,11 +8,35 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
+type Doc struct {
+	metric string
+	text   string
+}
+
+type Docs []Doc
+
+func (d Docs) Len() int           { return len(d) }
+func (d Docs) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+func (d Docs) Less(i, j int) bool { return d[i].metric < d[j].metric }
+
+func (d Docs) Print() {
+	sort.Sort(d)
+	for _, doc := range d {
+		fmt.Printf("* `%s`:  \n", doc.metric)
+		fmt.Print(doc.text)
+	}
+}
+
+var docs Docs
+
 func handle(list []*ast.Comment) {
 	active := false
+	var metric string
+	var buf string
 	for _, c := range list {
 		text := c.Text
 		if strings.HasPrefix(text, "//") {
@@ -22,11 +46,16 @@ func handle(list []*ast.Comment) {
 		parts := strings.Split(text, " ")
 		if len(parts) > 3 && parts[0] == "metric" && parts[2] == "is" {
 			active = true
-			fmt.Printf("* `%s`:  \n", parts[1])
-			fmt.Println(text[len(parts[0])+len(parts[1])+len(parts[2])+3:])
+			metric = parts[1]
+			buf += text[len(parts[0])+len(parts[1])+len(parts[2])+3:] + "\n"
 		} else if active {
-			fmt.Println(text)
+			buf += text + "\n"
 		}
+	}
+	if active {
+		docs = append(docs, Doc{
+			metric: metric,
+			text:   buf})
 	}
 }
 
@@ -69,4 +98,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	docs.Print()
 }
