@@ -25,9 +25,13 @@ func (d Docs) Less(i, j int) bool { return d[i].metric < d[j].metric }
 
 func (d Docs) Print() {
 	sort.Sort(d)
+	var prev string
 	for _, doc := range d {
-		fmt.Printf("* `%s`:  \n", doc.metric)
-		fmt.Print(doc.text)
+		if prev != doc.metric {
+			fmt.Printf("* `%s`:  \n", doc.metric)
+			fmt.Print(doc.text)
+			prev = doc.metric
+		}
 	}
 }
 
@@ -78,6 +82,9 @@ func main() {
 		src, err := parser.ParseFile(fset, path, nil, mode)
 		if err != nil {
 			return err
+		}
+		for _, c := range src.Comments {
+			handle(c.List)
 		}
 		for _, d := range src.Decls {
 			if d, ok := d.(*ast.GenDecl); ok {
