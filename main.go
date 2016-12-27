@@ -73,6 +73,9 @@ func main() {
 	fmt.Println("# Overview of metrics")
 	fmt.Printf("(only shows metrics that are documented. generated with [metrics2docs](github.com/Dieterbe/metrics2docs))\n\n")
 	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
 		if f.IsDir() {
 			return nil
 		}
